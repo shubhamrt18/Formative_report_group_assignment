@@ -10,18 +10,14 @@ output: pdf_document
 ---
 
 ```{r setup, include=FALSE}
-# -------------------------
-# GLOBAL SETUP (runs first)
-# -------------------------
 
-# Load essential libraries
-if (!require(ProjectTemplate)) install.packages("ProjectTemplate", repos = "https://cloud.r-project.org") #if packages are not installed intalll it first
+# Load essential library
+#Also if the packages are not installed intalll it first
+if (!require(ProjectTemplate)) install.packages("ProjectTemplate", repos = "https://cloud.r-project.org")
 library(ProjectTemplate)
 
-# Load the full project (this sources the 01-A.R and loads merged_bmi_data)
 load.project() 
 
-# Load analysis libraries
 if (!require(tidyverse)) install.packages("tidyverse", repos = "https://cloud.r-project.org")
 library(tidyverse)
 library(knitr)
@@ -29,7 +25,6 @@ library(ggplot2)
 library(dplyr)
 library(scales)
 
-# knitr options for reproducibility and clarity
 knitr::opts_chunk$set(
   echo = TRUE,
   message = FALSE,
@@ -41,10 +36,10 @@ knitr::opts_chunk$set(
 )
 theme_set(theme_minimal())
 
+# Retrieve the  merged dataset 
+report_data <- get("merged_bmi_data")  
 
-report_data <- get("merged_bmi_data")  # Retrieve the merged dataset 
-
-# Define year range variables dynamically
+#get the Year from report data
 start_year <- min(report_data$Year)
 end_year <- max(report_data$Year)
 ```
@@ -96,7 +91,6 @@ Data preparation was handled in the preprocessing script (`munge/01-A.R`), which
 
 For our first analysis, we calculate the absolute percentage point (pp) change in obesity prevalence for each age-sex group between `r start_year` and `r end_year`.
 ```{r absolute-change-calc, echo=TRUE, results='asis'}
-# Filter start and end year data, then calculate the difference
 absolute_change_summary <- report_data %>%
   filter(Metric_Category == "Obesity") %>%
   group_by(Age_Group, Sex) %>%
@@ -108,7 +102,7 @@ absolute_change_summary <- report_data %>%
     .groups = 'drop'
   )
 
-# Format and display the results
+# Format the data and then display the results
 cat("\n**Table 1: Absolute Change in Obesity Prevalence in China (", start_year, "to", end_year, ")**\n\n")
 absolute_change_summary %>% 
   mutate(
@@ -144,12 +138,11 @@ While Cycle 1 focused on obesity, a complete understanding of nutritional health
 
 ## 2.2 Modeling: Longitudinal Visualization of Obesity Trends
 ```{r longitudinal-plot, echo=TRUE, fig.cap="Longitudinal Trends in Obesity Prevalence (2012-2022) for Adults and Children/Adolescents in China, with 95% Uncertainty Intervals",fig.height=4.5}
-# Prepare data for obesity visualization
+# Prepare data for obesity 
 plot_data_obesity <- report_data %>%
   filter(Metric_Category == "Obesity") %>%
   mutate(Group = paste(Age_Group, Sex, sep = " - "))
 
-# Generate the plot
 longitudinal_trend_plot <- ggplot(plot_data_obesity, 
                                    aes(x = Year, y = Prevalence, 
                                        color = Group, fill = Group)) +
@@ -175,12 +168,12 @@ print(longitudinal_trend_plot)
 
 To complete the malnutrition picture, we examine the prevalence of underweight in adults (BMI < 18.5 kg/m2) and thinness in children (BMI < -2SD). This provides crucial context to the obesity epidemic.
 ```{r underweight-plot, echo=TRUE, fig.cap="Underweight/Thinness Prevalence Trends (2012-2022) for Adults and Children/Adolescents in China, with 95% Uncertainty Intervals",fig.height=5.0}
-# Prepare data for underweight visualization
+# Prepare data for underweight viz.
 plot_data_underweight <- report_data %>%
   filter(Metric_Category == "Underweight/Thinness") %>%
   mutate(Group = paste(Age_Group, Sex, sep = " - "))
 
-# Generate the plot
+# Plot using the dat a using  ggplot
 underweight_trend_plot <- ggplot(plot_data_underweight, 
                                   aes(x = Year, y = Prevalence, 
                                       color = Group, fill = Group)) +
@@ -204,7 +197,7 @@ print(underweight_trend_plot)
 
 ## 2.4 Evaluation (Cycle 2)
 ```{r cycle2-evaluation, echo=FALSE}
-# Calculate summary statistics for interpretation
+#Calculate summary
 obesity_trends <- report_data %>%
   filter(Metric_Category == "Obesity") %>%
   group_by(Age_Group, Sex) %>%
