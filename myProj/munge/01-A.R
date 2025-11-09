@@ -1,7 +1,6 @@
 # Example preprocessing script.
-#
-# This script is modified to load BOTH obesity and underweight/thinness
-# data into a single, tidy data frame.
+
+
 library(dplyr)
 library(ggplot2)
 library(readxl)
@@ -23,7 +22,7 @@ Child <- read_excel(
   .name_repair = "minimal"
 )
 
-# 1a. Prepare ADULT OBESITY Data
+# ADULT OBESITY Data
 adult_obesity <- Adult %>%
   select(
     Year,
@@ -44,7 +43,7 @@ adult_obesity <- Adult %>%
     Metric_Category = "Obesity"
   )
 
-# 1b. Prepare ADULT UNDERWEIGHT Data
+#UNDERWEIGHT Data
 adult_underweight <- Adult %>%
   select(
     Year,
@@ -65,7 +64,7 @@ adult_underweight <- Adult %>%
     Metric_Category = "Underweight/Thinness"
   )
 
-# 2a. Prepare CHILD OBESITY Data
+# CHILD OBESITY Data
 child_obesity <- Child %>%
   select(
     Year,
@@ -86,7 +85,7 @@ child_obesity <- Child %>%
     Metric_Category = "Obesity"
   )
 
-# 2b. Prepare CHILD THINNESS Data
+# CHILD THINNESS Data
 child_thinness <- Child %>%
   select(
     Year,
@@ -107,7 +106,7 @@ child_thinness <- Child %>%
     Metric_Category = "Underweight/Thinness"
   )
 
-# 3. Merge all four datasets vertically
+#Merge all four datasets vertically
 merged_bmi_data <- bind_rows(
   adult_obesity,
   adult_underweight,
